@@ -6,7 +6,7 @@ the pen draws a dark line, the eraser paints white, the eraser never paints over
 and the pen still draws after the eraser was used.
 
 ## How to run
-You need Java, Python 3 and Processing's `core.jar` (it comes with Processing, in `core/library/core.jar`).
+You need Java, Python 3 and Processing's `core.jar` (it comes with Processing, in `core/library/core.jar`). On a machine without a screen (a server) you also need `xvfb-run`.
 
 ```sh
 PROCESSING_CORE=/path/to/processing/core/library/core.jar tests/run_tests.sh

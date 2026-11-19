@@ -38,12 +38,14 @@ void draw()
   if ( draw == true && mouseX>drawingSurfaceX && mouseX<drawingSurfaceX+drawingSurfaceWidth && mouseY>drawingSurfaceY && mouseY<drawingSurfaceY+drawingSurfaceHeight) {
     if ( tool.equals("eraser") ) {
       //Eraser: a circle stamp filled with the drawing surface colour and no outline
-      clip( drawingSurfaceX+1, drawingSurfaceY+1, drawingSurfaceWidth-2, drawingSurfaceHeight-2 ); //Only paint inside the surface, keep its border
+      //Note: one circle is stamped per frame, so moving the mouse very fast leaves gaps
+      pushStyle(); //Remember the pen's colours so the pen still draws black lines afterwards
+      clip( drawingSurfaceX+1, drawingSurfaceY+1, drawingSurfaceWidth-1, drawingSurfaceHeight-1 ); //Only paint inside the surface, keep its border (clip uses imageMode, CORNER by default)
       noStroke();
       fill(drawingSurfaceColour);
       ellipse( mouseX, mouseY, eraserDiameter, eraserDiameter );
-      stroke(0); //Put the outline back so the pen still draws black lines
       noClip();
+      popStyle(); //Put the pen's colours back
     } else {
       line (mouseX, mouseY, pmouseX, pmouseY); //Pen
     }

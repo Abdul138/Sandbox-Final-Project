@@ -7,7 +7,6 @@ import processing.core.*;
 public class DrawingProgramTest extends DrawingProgram {
   int failures = 0;
   int step = 0;
-  int borderBefore, outsideBefore;
 
   public static void main(String[] args) {
     PApplet.main("DrawingProgramTest");
@@ -46,17 +45,34 @@ public class DrawingProgramTest extends DrawingProgram {
       check(isWhite(pixelAt(150, 100)), "eraser paints the line white where it touches");
       check(isDark(pixelAt(120, 100)), "eraser leaves the line alone outside its circle");
     } else if (step == 3) {
-      // Eraser right next to the edges: must not paint over the border or the grey area
-      int rightEdge = (int)(drawingSurfaceX + drawingSurfaceWidth);
-      borderBefore = pixelAt(0, 300);
-      outsideBefore = pixelAt(rightEdge + 3, 300);
-      moveMouse(3, 300, 3, 300);
+      // Eraser right next to every edge: it must reach the last white pixel inside the border,
+      // but never paint over the border itself or the grey area outside the surface
+      int right = (int)(drawingSurfaceX + drawingSurfaceWidth);   // border column on the right
+      int bottom = (int)(drawingSurfaceY + drawingSurfaceHeight); // border row at the bottom
+      int[][] border = { {0, 300}, {right, 300}, {200, 0}, {200, bottom} };
+      int[][] outside = { {right + 3, 300}, {200, bottom + 3} };
+      int[] borderBefore = new int[border.length];
+      int[] outsideBefore = new int[outside.length];
+      for (int i = 0; i < border.length; i++) borderBefore[i] = pixelAt(border[i][0], border[i][1]);
+      for (int i = 0; i < outside.length; i++) outsideBefore[i] = pixelAt(outside[i][0], outside[i][1]);
+      // Pen marks hugging the inside of the right and bottom borders
+      pressKey('p');
+      moveMouse(right - 1, 250, right - 1, 350);
       super.draw();
-      moveMouse(rightEdge - 3, 300, rightEdge - 3, 300);
+      moveMouse(150, bottom - 1, 250, bottom - 1);
       super.draw();
-      check(pixelAt(0, 300) == borderBefore, "eraser does not rub out the surface border");
-      check(pixelAt(rightEdge + 3, 300) == outsideBefore, "eraser does not paint outside the surface");
-      check(isWhite(pixelAt(rightEdge - 4, 300)), "eraser still works close to the edge");
+      check(isDark(pixelAt(right - 1, 300)) && isDark(pixelAt(200, bottom - 1)), "pen can draw right next to the border");
+      pressKey('e');
+      int[][] stamps = { {3, 300}, {right - 3, 300}, {200, 3}, {200, bottom - 3} };
+      for (int[] s : stamps) { moveMouse(s[0], s[1], s[0], s[1]); super.draw(); }
+      boolean bordersKept = true;
+      for (int i = 0; i < border.length; i++) bordersKept &= pixelAt(border[i][0], border[i][1]) == borderBefore[i];
+      check(bordersKept, "eraser does not rub out the surface border (all four sides)");
+      boolean outsideKept = true;
+      for (int i = 0; i < outside.length; i++) outsideKept &= pixelAt(outside[i][0], outside[i][1]) == outsideBefore[i];
+      check(outsideKept, "eraser does not paint outside the surface");
+      check(isWhite(pixelAt(right - 1, 300)) && isWhite(pixelAt(200, bottom - 1)), "eraser reaches the last pixel next to the right and bottom borders");
+      check(isWhite(pixelAt(1, 300)) && isWhite(pixelAt(200, 1)), "eraser reaches the first pixel next to the left and top borders");
     } else if (step == 4) {
       pressKey('p');
       check(tool.equals("pen"), "pressing p selects the pen again");
