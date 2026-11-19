@@ -7,7 +7,10 @@ import ddf.minim.ugens.*;
 
 //Global Variables
 float drawingSurfaceX, drawingSurfaceY, drawingSurfaceWidth, drawingSurfaceHeight, drawingDiameter;
+float eraserDiameter;
 Boolean draw=false;
+String tool = "pen"; //Which tool is selected: "pen" or "eraser" (press p or e to switch)
+color drawingSurfaceColour = color(255); //White, the colour the eraser paints with
 //
 void setup()
 {
@@ -22,7 +25,9 @@ void setup()
   drawingSurfaceWidth = width*3/4;
   drawingSurfaceHeight = height*4/5;
   drawingDiameter = width*1/100;
+  eraserDiameter = width*1/25; //Bigger than the pen so it is easy to rub things out
   //
+  fill(drawingSurfaceColour);
   rect( drawingSurfaceX, drawingSurfaceY, drawingSurfaceWidth, drawingSurfaceHeight );
   //
 }//End setup
@@ -30,10 +35,25 @@ void setup()
 void draw()
 {
   //ellipse( mouseX, mouseY, drawingDiameter, drawingDiameter); //Example Circle Drawing Tool
-  if ( draw == true && mouseX>drawingSurfaceX && mouseX<drawingSurfaceX+drawingSurfaceWidth && mouseY>drawingSurfaceY && mouseY<drawingSurfaceY+drawingSurfaceHeight) line (mouseX, mouseY, pmouseX, pmouseY); 
+  if ( draw == true && mouseX>drawingSurfaceX && mouseX<drawingSurfaceX+drawingSurfaceWidth && mouseY>drawingSurfaceY && mouseY<drawingSurfaceY+drawingSurfaceHeight) {
+    if ( tool.equals("eraser") ) {
+      //Eraser: a circle stamp filled with the drawing surface colour and no outline
+      clip( drawingSurfaceX+1, drawingSurfaceY+1, drawingSurfaceWidth-2, drawingSurfaceHeight-2 ); //Only paint inside the surface, keep its border
+      noStroke();
+      fill(drawingSurfaceColour);
+      ellipse( mouseX, mouseY, eraserDiameter, eraserDiameter );
+      stroke(0); //Put the outline back so the pen still draws black lines
+      noClip();
+    } else {
+      line (mouseX, mouseY, pmouseX, pmouseY); //Pen
+    }
+  }
 }//End draw
 //
 void keyPressed() {
+  //Tool Selection
+  if ( key=='e' || key=='E' ) tool = "eraser";
+  if ( key=='p' || key=='P' ) tool = "pen";
 }//End keyPressed
 //
 void mousePressed()
