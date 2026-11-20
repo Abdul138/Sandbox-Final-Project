@@ -86,6 +86,20 @@ public class DrawingProgramTest extends DrawingProgram {
       pressKey('x');
       check(tool.equals("pen"), "other keys do not change the tool");
     } else if (step == 5) {
+      // The mouse comes back into the surface from the grey area while drawing:
+      // the pen line starts outside (pmouse), but only the part inside the surface may be painted
+      int right = (int)(drawingSurfaceX + drawingSurfaceWidth);
+      int bottom = (int)(drawingSurfaceY + drawingSurfaceHeight);
+      int greyRight = pixelAt(right + 10, 400);
+      int greyBelow = pixelAt(100, bottom + 10);
+      check(tool.equals("pen"), "pen is selected for the re-entry checks");
+      moveMouse(right + 20, 400, right - 20, 400); // came in through the right side
+      super.draw();
+      moveMouse(100, bottom + 20, 100, bottom - 20); // came in through the bottom
+      super.draw();
+      check(isDark(pixelAt(right - 10, 400)) && isDark(pixelAt(100, bottom - 10)), "pen still draws the part of the line inside the surface");
+      check(pixelAt(right + 10, 400) == greyRight && pixelAt(100, bottom + 10) == greyBelow, "pen does not paint outside the surface when the mouse comes back in");
+    } else if (step == 6) {
       System.out.println(failures == 0 ? "ALL TESTS PASSED" : failures + " TEST(S) FAILED");
       System.exit(failures == 0 ? 0 : 1);
     }

@@ -3,7 +3,7 @@
 `run_tests.sh` checks the Drawing Program (`Drawing Lessons/DrawingProgram`) automatically.
 It acts like a user (clicks, moves the mouse, presses `e` / `p`) and then checks pixel colours, for example:
 the pen draws a dark line, the eraser paints white, the eraser never paints over the border or outside the surface,
-and the pen still draws after the eraser was used.
+the pen still draws after the eraser was used, and the pen does not paint outside the surface when the mouse comes back in.
 
 ## How to run
 You need Java, Python 3 and Processing's `core.jar` (it comes with Processing, in `core/library/core.jar`). On a machine without a screen (a server) you also need `xvfb-run`.
