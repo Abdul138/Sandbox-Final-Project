@@ -40,17 +40,27 @@ void draw()
       //Eraser: a circle stamp filled with the drawing surface colour and no outline
       //Note: one circle is stamped per frame, so moving the mouse very fast leaves gaps
       pushStyle(); //Remember the pen's colours so the pen still draws black lines afterwards
-      clip( drawingSurfaceX+1, drawingSurfaceY+1, drawingSurfaceWidth-1, drawingSurfaceHeight-1 ); //Only paint inside the surface, keep its border (clip uses imageMode, CORNER by default)
+      clipToDrawingSurface(); //Only paint inside the surface, keep its border
       noStroke();
       fill(drawingSurfaceColour);
       ellipse( mouseX, mouseY, eraserDiameter, eraserDiameter );
       noClip();
       popStyle(); //Put the pen's colours back
     } else {
-      line (mouseX, mouseY, pmouseX, pmouseY); //Pen
+      //Pen: pmouseX/pmouseY can still be outside the surface (the mouse just came back in),
+      //so clip the line too, otherwise it paints over the border and the grey area
+      clipToDrawingSurface();
+      line (mouseX, mouseY, pmouseX, pmouseY);
+      noClip();
     }
   }
 }//End draw
+//
+void clipToDrawingSurface() {
+  //Limits drawing to the white surface, without its 1-pixel border (clip uses imageMode, CORNER by default)
+  //Remember to call noClip() when finished
+  clip( drawingSurfaceX+1, drawingSurfaceY+1, drawingSurfaceWidth-1, drawingSurfaceHeight-1 );
+}//End clipToDrawingSurface
 //
 void keyPressed() {
   //Tool Selection
